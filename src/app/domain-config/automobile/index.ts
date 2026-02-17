@@ -1,1 +1,0 @@
-export * from './automobile.domain-config';

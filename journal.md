@@ -60,3 +60,41 @@ The implementation follows the URL-First architecture from the vvroom framework:
 - Click any tile card to open popout
 - Type in either input field - changes sync bidirectionally
 - Close popout - tile reappears on home page
+
+## 2026-02-17: R3 Framework Compliance Assessment
+
+### Summary
+
+Assessed the popout application against the R3 URL-First architecture tenets documented in the vvroom-textbook (BROWNFIELD-COMPANION-R3.md and related chapter files).
+
+### Core URL-First Compliance: ✅ PASS
+
+The application correctly implements the fundamental URL-First principles:
+
+| Principle | Implementation |
+|-----------|----------------|
+| URL as single source of truth | `UrlStateService.watchParams()` reads state from URL |
+| State updates via URL | `UrlStateService.setParam()` writes to URL |
+| Cross-window sync | `BroadcastChannel` API via `PopOutContextService` |
+| Debounced input | 300ms debounce prevents excessive URL updates |
+
+### Framework Modularity: ✅ VALIDATED
+
+The R3 framework is designed as a modular toolkit where applications adopt features as needed:
+
+| Framework Feature | Purpose | Used by Popout |
+|------------------|---------|----------------|
+| `UrlStateService` | URL-First state management | ✅ Yes |
+| `BroadcastChannel` / `PopOutContextService` | Multi-window communication | ✅ Yes |
+| `ResourceDefinition` | Domain data modeling | ❌ Not needed |
+| `GenericUrlMapper` | Complex URL state mapping | ❌ Not needed |
+| `GenericApiAdapter` | External API integration | ❌ Not needed |
+| Table/Filter configs | Data table rendering | ❌ Not needed |
+
+### Key Insight
+
+Not all applications require external data sources, pickers, tables, or charts. The framework should be opt-in: an application imports the `framework/` and `domain-config/` directories, then implements only the features it needs.
+
+The popout application is **correctly minimal**. It uses the URL-First core (`UrlStateService`, `BroadcastChannel`) and omits `ResourceDefinition`, `GenericUrlMapper`, and `GenericApiAdapter` because those solve problems this application doesn't have.
+
+**This validates the framework's modularity: adopt features as your application requires them.**
