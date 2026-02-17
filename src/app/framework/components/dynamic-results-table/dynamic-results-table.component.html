@@ -1,0 +1,149 @@
+<div class="dynamic-results-table-container" [attr.data-testid]="environment.includeTestIds ? 'dynamic-results-table-panel' : null">
+  <!-- Data Table with reorderable and resizable columns -->
+  <div class="table-container">
+    <p-table
+      [value]="(results$ | async) || []"
+      [columns]="columns"
+      [dataKey]="$any(domainConfig.tableConfig.dataKey)"
+      [loading]="(loading$ | async) || false"
+      [lazy]="true"
+      [paginator]="true"
+      [rows]="currentFilters['size'] || 20"
+      [first]="paginatorFirst"
+      [totalRecords]="(totalResults$ | async) || 0"
+      [rowsPerPageOptions]="domainConfig.tableConfig.rowsPerPageOptions || [10, 20, 50]"
+      [styleClass]="domainConfig.tableConfig.styleClass || ''"
+      [responsiveLayout]="domainConfig.tableConfig.responsiveLayout || 'scroll'"
+      [expandedRowKeys]="expandedRows"
+      [reorderableColumns]="true"
+      [resizableColumns]="true"
+      columnResizeMode="expand"
+      (onPage)="onPageChange($event)"
+      (onSort)="onSort($event)"
+      (onColReorder)="onColReorder($event)"
+      (onColResize)="onColResize($event)"
+      (onRowExpand)="onRowExpand($event)"
+      [showCurrentPageReport]="true"
+      [currentPageReportTemplate]="'Showing {first} to {last} of {totalRecords} results'"
+      [attr.data-testid]="environment.includeTestIds ? 'dynamic-results-table' : null">
+
+      <!-- Header with reorderable/resizable columns -->
+      <ng-template pTemplate="header" let-columns>
+        <tr>
+          <th *ngIf="domainConfig.tableConfig.expandable" style="width: 3rem"></th>
+          <th *ngFor="let col of columns; trackBy: trackByField"
+            pReorderableColumn
+            pResizableColumn
+            [pSortableColumn]="col.sortable ? col.field : undefined"
+            [ngStyle]="{'width': col.width, 'min-width': col.minWidth || '100px'}">
+            <div class="column-header">
+              <i class="pi pi-bars reorder-handle" pReorderableColumnDisabled="false"></i>
+              <span class="column-title">{{ col.header }}</span>
+              <p-sortIcon *ngIf="col.sortable" [field]="col.field"></p-sortIcon>
+            </div>
+          </th>
+        </tr>
+      </ng-template>
+
+      <!-- Body -->
+      <ng-template pTemplate="body" let-row let-columns="columns" let-expanded="expanded">
+        <tr>
+          <!-- Expand toggle -->
+          <td *ngIf="domainConfig.tableConfig.expandable">
+            <button type="button"
+              pButton
+              pRipple
+              [pRowToggler]="row"
+              class="p-button-text p-button-rounded p-button-plain"
+              [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'">
+            </button>
+          </td>
+
+          <!-- Data columns -->
+          <td *ngFor="let col of columns; trackBy: trackByField">
+            {{ row[col.field] }}
+          </td>
+        </tr>
+      </ng-template>
+
+      <!-- Row Expansion - VIN Sub-Table -->
+      <ng-template pTemplate="rowexpansion" let-row>
+        <tr>
+          <td [attr.colspan]="columns.length + 1">
+            <div class="row-expansion">
+              <div class="expansion-header">
+                <h3>VIN Records</h3>
+                <span class="vin-count">{{ row.instance_count || 0 }} VIN(s)</span>
+              </div>
+
+              <!-- Loading state -->
+              <div *ngIf="isVinLoading(row.vehicle_id)" class="vin-loading">
+                <p-progressSpinner [style]="{width: '30px', height: '30px'}"></p-progressSpinner>
+                <span>Loading VIN records...</span>
+              </div>
+
+              <!-- VIN Table -->
+              <div *ngIf="!isVinLoading(row.vehicle_id) && getVinsForVehicle(row.vehicle_id).length > 0" class="vin-table-container">
+                <p-table
+                  [value]="getVinsForVehicle(row.vehicle_id)"
+                  [columns]="vinColumns"
+                  styleClass="p-datatable-sm p-datatable-striped"
+                  [scrollable]="true"
+                  scrollHeight="300px">
+                  <ng-template pTemplate="header">
+                    <tr>
+                      <th *ngFor="let col of vinColumns" [ngStyle]="{'width': col.width}">
+                        {{ col.header }}
+                      </th>
+                    </tr>
+                  </ng-template>
+                  <ng-template pTemplate="body" let-vin>
+                    <tr>
+                      <td *ngFor="let col of vinColumns">
+                        <ng-container [ngSwitch]="col.field">
+                          <span *ngSwitchCase="'mileage'">{{ vin[col.field] | number }}</span>
+                          <span *ngSwitchCase="'estimated_value'">${{ vin[col.field] | number }}</span>
+                          <span *ngSwitchDefault>{{ vin[col.field] }}</span>
+                        </ng-container>
+                      </td>
+                    </tr>
+                  </ng-template>
+                </p-table>
+              </div>
+
+              <!-- No VINs message -->
+              <div *ngIf="!isVinLoading(row.vehicle_id) && getVinsForVehicle(row.vehicle_id).length === 0" class="no-vins">
+                <i class="pi pi-info-circle"></i>
+                <span>No VIN records found for this vehicle.</span>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <!-- Empty message -->
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td [attr.colspan]="columns.length + 1">
+            <div class="empty-message">
+              <i class="pi pi-inbox" style="font-size: 3rem"></i>
+              <p>No results found</p>
+              <p class="empty-hint">Try adjusting your filters</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <!-- Loading body -->
+      <ng-template pTemplate="loadingbody">
+        <ng-container *ngFor="let i of [1,2,3,4,5]">
+          <tr>
+            <td [attr.colspan]="columns.length + 1">
+              <p-skeleton width="100%" height="2rem"></p-skeleton>
+            </td>
+          </tr>
+        </ng-container>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

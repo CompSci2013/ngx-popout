@@ -1,0 +1,120 @@
+<div class="basic-results-table-container" [attr.data-testid]="environment.includeTestIds ? 'basic-results-table-panel' : null">
+  <!-- Data Table -->
+  <div class="table-container">
+    <p-table
+      [value]="results"
+      [columns]="domainConfig.tableConfig.columns"
+      [dataKey]="$any(domainConfig.tableConfig.dataKey)"
+      [loading]="loading"
+      [lazy]="true"
+      [paginator]="true"
+      [rows]="currentFilters['size'] || 20"
+      [first]="paginatorFirst"
+      [totalRecords]="totalResults"
+      [rowsPerPageOptions]="domainConfig.tableConfig.rowsPerPageOptions || [10, 20, 50]"
+      [styleClass]="domainConfig.tableConfig.styleClass || ''"
+      [responsiveLayout]="domainConfig.tableConfig.responsiveLayout || 'scroll'"
+      [expandedRowKeys]="expandedRows"
+      (onPage)="onPageChange($event)"
+      (onSort)="onSort($event)"
+      [showCurrentPageReport]="true"
+      [currentPageReportTemplate]="'Showing {first} to {last} of {totalRecords} results'"
+      [attr.data-testid]="environment.includeTestIds ? 'basic-results-table' : null">
+
+      <!-- Caption with result count -->
+      <ng-template pTemplate="caption">
+        <div class="table-caption">
+          <span class="caption-count">
+            {{ totalResults }} result(s)
+          </span>
+        </div>
+      </ng-template>
+
+      <!-- Header -->
+      <ng-template pTemplate="header" let-columns>
+        <tr>
+          <ng-container *ngIf="domainConfig.tableConfig.expandable">
+            <th style="width: 3rem"></th>
+          </ng-container>
+          <ng-container *ngFor="let col of columns">
+            <th
+              [pSortableColumn]="col.sortable ? col.field : undefined"
+              [ngStyle]="{'width': col.width}">
+              {{ col.header }}
+              <ng-container *ngIf="col.sortable">
+                <p-sortIcon [field]="col.field"></p-sortIcon>
+              </ng-container>
+            </th>
+          </ng-container>
+        </tr>
+      </ng-template>
+
+      <!-- Body -->
+      <ng-template pTemplate="body" let-row let-columns="columns" let-expanded="expanded">
+        <tr>
+          <!-- Expand toggle -->
+          <ng-container *ngIf="domainConfig.tableConfig.expandable">
+            <td>
+              <button type="button"
+                pButton
+                pRipple
+                [pRowToggler]="row"
+                class="p-button-text p-button-rounded p-button-plain"
+                [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'">
+              </button>
+            </td>
+          </ng-container>
+
+          <!-- Data columns -->
+          <ng-container *ngFor="let col of columns">
+            <td>
+              {{ row[col.field] }}
+            </td>
+          </ng-container>
+        </tr>
+      </ng-template>
+
+      <!-- Row Expansion -->
+      <ng-template #expandedrow let-row>
+        <tr>
+          <td [attr.colspan]="domainConfig.tableConfig.columns.length + 1">
+            <div class="row-expansion">
+              <h3>Details</h3>
+              <div class="expansion-grid">
+                <ng-container *ngFor="let key of Object.keys(row)">
+                  <div class="expansion-field">
+                    <strong>{{ key }}:</strong> {{ row[key] }}
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <!-- Empty message -->
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td [attr.colspan]="domainConfig.tableConfig.columns.length + 1">
+            <div class="empty-message">
+              <i class="pi pi-inbox" style="font-size: 3rem"></i>
+              <p>No results found</p>
+              <p class="empty-hint">Try adjusting your filters</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <!-- Loading body -->
+      <ng-template pTemplate="loadingbody">
+        <ng-container *ngFor="let i of [1,2,3,4,5]">
+          <tr>
+            <td [attr.colspan]="domainConfig.tableConfig.columns.length + 1">
+              <p-skeleton width="100%" height="2rem"></p-skeleton>
+            </td>
+          </tr>
+        </ng-container>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

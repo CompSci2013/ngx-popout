@@ -1,0 +1,220 @@
+.results-table-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1rem;
+
+  .filter-panel-container {
+    border: 1px solid var(--surface-border);
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--surface-card);
+
+    &.collapsed .filter-grid {
+      display: none;
+    }
+  }
+
+  .filter-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background-color: var(--surface-50);
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 1px solid var(--surface-border);
+
+    .filter-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      color: var(--text-color);
+
+      i {
+        font-size: 1rem;
+      }
+    }
+
+    i:last-child {
+      color: var(--text-color-secondary);
+    }
+
+    &:hover {
+      background-color: var(--surface-section);
+    }
+  }
+
+  .filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    align-items: end;
+    padding: 1rem;
+
+    .filter-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      &.filter-field-wide {
+        grid-column: 1 / -1;
+      }
+
+      label {
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: var(--text-color);
+      }
+
+      input,
+      p-inputNumber,
+      p-select,
+      p-calendar,
+      p-checkbox {
+        width: 100%;
+      }
+    }
+  }
+
+  .table-container {
+    background: var(--surface-card);
+    border-radius: 6px;
+    padding: 1rem;
+
+    ::ng-deep .p-datatable {
+      // Use a more visible border color for dark theme
+      --table-border-color: #4b5563; // Tailwind gray-600, visible on dark backgrounds
+
+      .p-datatable-thead > tr > th,
+      .p-datatable-tbody > tr > td {
+        padding: 0rem 0.5rem; // Reduced by 50% from default ~0.75rem
+        border: 1px solid var(--table-border-color);
+      }
+
+      // Ensure header row has bottom border
+      .p-datatable-thead > tr > th {
+        border-bottom-width: 2px;
+      }
+
+      // Table outer border
+      .p-datatable-table {
+        border: 1px solid var(--table-border-color);
+      }
+
+      // Paginator - remove border
+      .p-paginator {
+        border: none;
+      }
+
+      // Ensure table wrapper allows horizontal scroll when columns are expanded
+      .p-datatable-table-container {
+        overflow-x: auto;
+      }
+    }
+
+    .table-caption {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      background-color: var(--surface-50);
+      border-bottom: 1px solid var(--surface-border);
+
+      .caption-count {
+        font-size: 0.875rem;
+        color: var(--text-color-secondary);
+      }
+    }
+
+    .empty-message {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-color-secondary);
+
+      i {
+        color: var(--text-color-secondary);
+        opacity: 0.5;
+      }
+
+      p {
+        margin: 1rem 0 0.5rem;
+        font-size: 1.125rem;
+      }
+
+      .empty-hint {
+        font-size: 0.875rem;
+        margin: 0.5rem 0 0;
+      }
+    }
+
+    .row-expansion {
+      padding: 1.5rem;
+      background: #1f1f23; // Dark surface for expansion (explicit dark color)
+      border-left: 3px solid var(--p-primary-color, #34d399);
+
+      h3 {
+        margin: 0 0 1rem;
+        font-size: 1.125rem;
+        color: #ffffff;
+      }
+
+      .expansion-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 0; // No gap - borders provide separation
+
+        .expansion-field {
+          display: flex;
+          flex-direction: column;
+          gap: 0.25rem;
+          padding: 0.75rem;
+          border: 1px solid #4b5563; // Match table border color
+
+          strong {
+            color: #a1a1aa; // Muted gray for labels
+            font-size: 0.75rem;
+            text-transform: uppercase;
+          }
+
+          // Value text (after the strong label)
+          color: #ffffff;
+        }
+      }
+    }
+  }
+
+  .statistics-panel {
+    ::ng-deep .p-panel-content {
+      padding: 1rem;
+    }
+
+    .statistics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+
+      .stat-card {
+        padding: 1.5rem;
+        background: var(--surface-card);
+        border-radius: 6px;
+        border: 1px solid var(--surface-border);
+        text-align: center;
+
+        .stat-value {
+          font-size: 2rem;
+          font-weight: 700;
+          color: var(--primary-color);
+          margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+          font-size: 0.875rem;
+          color: var(--text-color-secondary);
+          text-transform: capitalize;
+        }
+      }
+    }
+  }
+}

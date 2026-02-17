@@ -1,0 +1,141 @@
+.picker-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  background: var(--surface-card);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--surface-border);
+}
+
+.picker-search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+
+  .search-input {
+    flex: 1;
+    width: 100%;
+  }
+}
+
+.table-caption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  gap: 1rem;
+  background-color: var(--surface-50);
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.table-actions {
+  display: flex;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.empty-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  color: var(--text-color-secondary);
+
+  .empty-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+  }
+
+  p {
+    margin: 0;
+    font-size: 1rem;
+  }
+}
+
+.loading-row {
+  padding: 0.5rem;
+}
+
+.picker-error {
+  margin-top: 1rem;
+}
+
+// PrimeNG table overrides
+::ng-deep {
+  .p-datatable {
+    // Use a more visible border color for dark theme
+    --table-border-color: #4b5563; // Tailwind gray-600
+
+    .p-datatable-thead > tr > th {
+      background: var(--surface-section);
+      color: var(--text-color);
+      font-weight: 600;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--table-border-color);
+    }
+
+    .p-datatable-tbody > tr {
+      background: var(--surface-card);
+      color: var(--text-color);
+
+      &:hover {
+        background: var(--surface-hover);
+      }
+
+      > td {
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--table-border-color);
+      }
+    }
+
+    .p-paginator {
+      background: var(--surface-section);
+      color: var(--text-color);
+      border: none;
+      padding: 0.5rem 1rem;
+    }
+
+    // Ensure table wrapper allows horizontal scroll when columns are expanded
+    .p-datatable-table-container {
+      overflow-x: auto;
+    }
+  }
+
+  // PrimeNG 19 checkbox styling for dark theme visibility
+  .p-checkbox {
+    .p-checkbox-box {
+      border: 2px solid #6b7280; // Gray-500, visible on dark backgrounds
+
+      &.p-highlight {
+        border-color: var(--p-primary-color, #34d399);
+        background: var(--p-primary-color, #34d399);
+      }
+
+      &:not(.p-disabled):hover {
+        border-color: var(--p-primary-color, #34d399);
+      }
+    }
+  }
+
+  .p-button {
+    &.p-button-outlined {
+      &.p-button-secondary {
+        color: var(--text-color);
+        border-color: var(--surface-border);
+
+        &:not(:disabled):hover {
+          background: var(--surface-hover);
+          border-color: var(--text-color);
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,31 @@
+<!-- Base Chart Component Template -->
+<div class="chart-wrapper">
+  <!-- Error boundary fallback -->
+  <ng-container *ngIf="hasError">
+    <div class="chart-error">
+      <div class="error-content">
+        <i class="pi pi-exclamation-triangle"></i>
+        <p class="error-title">Chart failed to render</p>
+        <p class="error-message">{{ errorMessage }}</p>
+        <button
+          pButton
+          type="button"
+          label="Retry"
+          icon="pi pi-refresh"
+          class="p-button-outlined p-button-sm"
+          (click)="retryRender()">
+        </button>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Plotly chart container (hidden when error) -->
+  <div #chartContainer class="chart-container" [hidden]="hasError"></div>
+
+  <!-- No data message -->
+  <ng-container *ngIf="!statistics && !hasError">
+    <div class="no-data-message">
+      <p>No data available</p>
+    </div>
+  </ng-container>
+</div>

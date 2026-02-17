@@ -1,0 +1,249 @@
+.dynamic-results-table-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+
+  .table-container {
+    background: var(--surface-card);
+    border-radius: 6px;
+    padding: 0;
+
+    ::ng-deep .p-datatable {
+      // Use a more visible border color for dark theme
+      --table-border-color: #4b5563; // Tailwind gray-600, visible on dark backgrounds
+
+      // Header row and cells - compact height, no visible borders
+      .p-datatable-thead > tr {
+        border: none;
+
+        > th {
+          padding: 0.5rem;
+          border: none;
+        }
+      }
+
+      // Body cells - compact height (match header row height)
+      .p-datatable-tbody > tr > td {
+        padding: 0.5rem;
+        border: 1px solid var(--table-border-color);
+
+        // Compact expand button to fit row height
+        button.p-button-rounded {
+          width: 1.25rem;
+          height: 1.25rem;
+          padding: 0;
+
+          .p-button-icon {
+            font-size: 0.625rem;
+          }
+        }
+      }
+
+      // Table outer border - removed per user preference
+      .p-datatable-table {
+        border: none;
+      }
+
+      // Column header layout with drag handle
+      .column-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        .reorder-handle {
+          cursor: grab;
+          color: var(--text-color-secondary);
+          font-size: 0.75rem;
+          opacity: 0.6;
+
+          &:hover {
+            opacity: 1;
+            color: var(--p-primary-color, #34d399);
+          }
+
+          &:active {
+            cursor: grabbing;
+          }
+        }
+
+        .column-title {
+          flex: 1;
+        }
+      }
+
+      // Resizable column handle styling
+      .p-datatable-resizable > .p-datatable-table > .p-datatable-thead > tr > th {
+        position: relative;
+
+        // Column resize handle
+        .p-column-resizer {
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: 8px;
+          height: 100%;
+          cursor: col-resize;
+          background: transparent;
+
+          &:hover {
+            background-color: var(--p-primary-color, #34d399);
+          }
+        }
+      }
+
+      // Drop indicator for column reorder
+      .p-datatable-reorder-indicator-up,
+      .p-datatable-reorder-indicator-down {
+        color: var(--p-primary-color, #34d399);
+      }
+
+      // Make entire datatable scroll horizontally together (table + paginator)
+      overflow-x: auto;
+
+      .p-datatable-wrapper {
+        overflow-x: visible;
+      }
+
+      .p-paginator {
+        border: none;
+        box-sizing: border-box;
+        min-width: 0 !important;
+        width: 100%;
+      }
+    }
+
+    .empty-message {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-color-secondary);
+
+      i {
+        color: var(--text-color-secondary);
+        opacity: 0.5;
+      }
+
+      p {
+        margin: 1rem 0 0.5rem;
+        font-size: 1.125rem;
+      }
+
+      .empty-hint {
+        font-size: 0.875rem;
+        margin: 0.5rem 0 0;
+      }
+    }
+
+    .row-expansion {
+      padding: 1.5rem;
+      background: #1f1f23; // Dark surface for expansion (explicit dark color)
+      border-left: 3px solid var(--p-primary-color, #34d399);
+
+      .expansion-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+
+        h3 {
+          margin: 0;
+          font-size: 1.125rem;
+          color: #ffffff;
+        }
+
+        .vin-count {
+          color: #a1a1aa;
+          font-size: 0.875rem;
+        }
+      }
+
+      h3 {
+        margin: 0 0 1rem;
+        font-size: 1.125rem;
+        color: #ffffff;
+      }
+
+      // VIN loading state
+      .vin-loading {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem;
+        color: #a1a1aa;
+      }
+
+      // VIN sub-table container
+      .vin-table-container {
+        ::ng-deep .p-datatable {
+          border: 1px solid #4b5563;
+          border-radius: 4px;
+
+          .p-datatable-thead > tr > th {
+            background: #2d2d33;
+            color: #a1a1aa;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            padding: 0.5rem;
+            border-bottom: 1px solid #4b5563;
+          }
+
+          .p-datatable-tbody > tr {
+            background: #1f1f23;
+
+            &:nth-child(odd) {
+              background: #25252b;
+            }
+
+            > td {
+              padding: 0.5rem;
+              color: #ffffff;
+              border: none;
+              border-bottom: 1px solid #3a3a40;
+            }
+
+            &:hover {
+              background: #333339;
+            }
+          }
+        }
+      }
+
+      // No VINs message
+      .no-vins {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem;
+        color: #a1a1aa;
+        font-size: 0.875rem;
+
+        i {
+          color: #f59e0b;
+        }
+      }
+
+      .expansion-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 0; // No gap - borders provide separation
+
+        .expansion-field {
+          display: flex;
+          flex-direction: column;
+          gap: 0.25rem;
+          padding: 0.75rem;
+          border: 1px solid #4b5563; // Match table border color
+
+          strong {
+            color: #a1a1aa; // Muted gray for labels
+            font-size: 0.75rem;
+            text-transform: uppercase;
+          }
+
+          // Value text (after the strong label)
+          color: #ffffff;
+        }
+      }
+    }
+  }
+}

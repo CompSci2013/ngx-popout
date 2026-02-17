@@ -1,0 +1,237 @@
+.query-control-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  border: 1px solid #444444;
+  border-radius: 4px;
+  background-color: #1a1a1a;
+  margin-bottom: 1rem;
+}
+
+.control-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  gap: 1rem;
+  background-color: var(--surface-50);
+  border-bottom: 1px solid #444444;
+
+  ::ng-deep .filter-field-dropdown {
+    flex: 1;
+    width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.active-filters {
+  padding: 1rem;
+  border-bottom: 1px solid #444444;
+
+  .active-filters-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #ffffff;
+  }
+
+  .filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+
+    ::ng-deep .filter-chip {
+      cursor: pointer;
+      user-select: none;
+
+      &:hover {
+        background-color: #333333;
+      }
+    }
+  }
+}
+
+.active-highlights {
+  padding: 1rem;
+
+  .highlights-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+
+    .active-highlights-label {
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .clear-highlights-link {
+      font-size: 0.9rem;
+      color: #64B5F6;
+      text-decoration: none;
+      cursor: pointer;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .highlight-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+
+    ::ng-deep .highlight-chip {
+      cursor: pointer;
+      user-select: none;
+      background-color: #fff3cd;
+      border-color: #ffc107;
+      color: #000000;
+
+      &:hover {
+        background-color: #ffe69c;
+      }
+
+      .p-chip-text,
+      .p-chip-label {
+        color: #000000;
+      }
+
+      .p-chip-remove-icon {
+        color: #000000;
+      }
+    }
+  }
+}
+
+// Dialog Styles
+.dialog-subtitle {
+  margin: 0 0 1rem 0;
+  color: #cccccc;
+  font-size: 0.95rem;
+}
+
+.search-box {
+  margin-bottom: 1rem;
+  width: 100%;
+
+  input {
+    width: 100%;
+  }
+}
+
+.options-list {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #444444;
+  border-radius: 4px;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  background-color: #000000;
+
+  .option-item {
+    padding: 0.5rem;
+    border-bottom: 1px solid #333333;
+    color: #ffffff;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background-color: #1a1a1a;
+    }
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 2rem;
+    color: #cccccc;
+
+    p {
+      margin: 0;
+    }
+  }
+}
+
+.loading-state,
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+
+  p {
+    margin: 0.5rem 0;
+    color: #cccccc;
+  }
+
+  i.pi {
+    font-size: 2rem;
+    color: #cccccc;
+    margin-bottom: 1rem;
+  }
+}
+
+.error-state {
+  i.pi-exclamation-triangle {
+    color: #ff6b6b;
+  }
+
+  p {
+    color: #ff6b6b;
+  }
+}
+
+.selection-summary {
+  padding: 0.75rem;
+  background-color: #1a1a1a;
+  border: 1px solid #444444;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+
+  span {
+    font-size: 0.9rem;
+    color: #ffffff;
+  }
+}
+
+// Range Dialog Styles (generic - supports integer, decimal, datetime)
+.range-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+
+  .p-field {
+    display: flex;
+    flex-direction: column;
+
+    label {
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    ::ng-deep p-inputNumber {
+      width: 100%;
+
+      input {
+        width: 100%;
+      }
+    }
+  }
+}
+
+// Utility Classes
+.w-full {
+  width: 100%;
+}
