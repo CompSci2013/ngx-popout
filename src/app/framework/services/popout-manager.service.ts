@@ -1,10 +1,13 @@
 /**
  * Pop-out Manager Service
  *
- * Manages pop-out window lifecycle:
+ * Encapsulates pop-out window lifecycle management including:
  * - Opening and tracking pop-out windows
  * - BroadcastChannel setup and message handling
+ * - State broadcasting to pop-outs
  * - Window close detection
+ *
+ * This service extracts pop-out management from DiscoverComponent for cleaner code.
  */
 
 import { Injectable, NgZone, OnDestroy } from '@angular/core';
@@ -20,6 +23,7 @@ import { PopOutContextService } from './popout-context.service';
 
 @Injectable()
 export class PopOutManagerService implements OnDestroy {
+  private gridId = '';
   private poppedOutPanels = new Set<string>();
   private popoutWindows = new Map<string, PopOutWindowRef>();
   private messagesSubject = new Subject<{ panelId: string; message: PopOutMessage }>();
@@ -37,12 +41,14 @@ export class PopOutManagerService implements OnDestroy {
     private ngZone: NgZone
   ) {}
 
-  initialize(): void {
+  initialize(gridId: string): void {
     if (this.initialized) {
       return;
     }
 
+    this.gridId = gridId;
     this.initialized = true;
+
     this.popOutContext.initializeAsParent();
     window.addEventListener('beforeunload', this.beforeUnloadHandler);
 
@@ -55,25 +61,25 @@ export class PopOutManagerService implements OnDestroy {
     return this.poppedOutPanels.has(panelId);
   }
 
+  getPoppedOutPanels(): string[] {
+    return Array.from(this.poppedOutPanels);
+  }
+
   openPopOut(
     panelId: string,
-    queryParams?: Record<string, string>,
+    panelType: string,
     features?: Partial<PopOutWindowFeatures>
   ): boolean {
     if (this.poppedOutPanels.has(panelId)) {
       return false;
     }
 
-    // Build URL: /panel/:panelId?key=value&...
-    let url = `/panel/${panelId}`;
-    if (queryParams && Object.keys(queryParams).length > 0) {
-      const params = new URLSearchParams(queryParams).toString();
-      url += `?${params}`;
-    }
+    // URL structure: /panel/:gridId/:panelId/:type (vvroom uses /panel prefix)
+    const url = `/panel/${this.gridId}/${panelId}/${panelType}`;
 
     const windowFeatures = buildWindowFeatures({
-      width: 400,
-      height: 400,
+      width: 1200,
+      height: 800,
       left: 100,
       top: 100,
       resizable: true,
@@ -111,21 +117,39 @@ export class PopOutManagerService implements OnDestroy {
       channel,
       checkInterval,
       panelId,
-      panelType: 'tile'
+      panelType
     });
 
     return true;
   }
 
-  sendMessage(panelId: string, message: PopOutMessage): void {
-    const ref = this.popoutWindows.get(panelId);
-    if (ref) {
+  /**
+   * Broadcast state to all popout windows
+   *
+   * @param state - Application state
+   * @param filterOptionsCache - Optional cached filter options
+   */
+  broadcastState(state: any, filterOptionsCache?: any): void {
+    if (this.popoutWindows.size === 0) {
+      return;
+    }
+
+    const message = {
+      type: PopOutMessageType.STATE_UPDATE,
+      payload: {
+        state,
+        filterOptionsCache: filterOptionsCache || null
+      },
+      timestamp: Date.now()
+    };
+
+    this.popoutWindows.forEach(({ channel }) => {
       try {
-        ref.channel.postMessage(message);
+        channel.postMessage(message);
       } catch {
         // Silently ignore posting errors
       }
-    }
+    });
   }
 
   closePopOut(panelId: string): void {

@@ -10,7 +10,8 @@ import { TilePopoutComponent } from './features/tile-popout/tile-popout.componen
 const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
-  { path: 'panel/:panelId', component: TilePopoutComponent },
+  { path: 'panel/:gridId/:panelId/:type', component: TilePopoutComponent },
+  // 404 fallback route - redirect unmatched paths to home
   { path: '**', redirectTo: 'home' }
 ];
 

@@ -54,7 +54,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.popOutManager.initialize();
+    this.popOutManager.initialize('home');
 
     // Handle popout closed
     this.popOutManager.closed$
@@ -86,11 +86,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         .subscribe(text => {
           // If tile is popped out, sync to popout
           if (this.poppedOutTiles.has(tile.id)) {
-            this.popOutManager.sendMessage(tile.id, {
-              type: PopOutMessageType.URL_PARAMS_SYNC,
-              payload: { params: { text } },
-              timestamp: Date.now()
-            });
+            this.popOutManager.broadcastState({ tile: tile.id, text });
           }
         });
     });
@@ -117,10 +113,10 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     const text = this.tileInputs[tile.id] || '';
-    const success = this.popOutManager.openPopOut(
-      tile.id,
-      text ? { text } : undefined
-    );
+    const success = this.popOutManager.openPopOut(tile.id, `tile?text=${encodeURIComponent(text)}`, {
+      width: 400,
+      height: 400
+    });
 
     if (success) {
       this.poppedOutTiles.add(tile.id);
