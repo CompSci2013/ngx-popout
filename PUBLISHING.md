@@ -7,9 +7,21 @@ This document covers how to publish `@halolabs/ngx-popout` to the GitLab npm reg
 - A GitLab Personal Access Token (PAT) with `api` scope
 - The library built successfully (`npm run build`)
 
-## Publisher Setup
+## Step 1: Verify the Package Registry is Available
 
-### 1. Create `.npmrc` in the library's project directory
+```bash
+# Check your GitLab version
+curl -s -H "PRIVATE-TOKEN: <your-token>" "http://gitlab.minilab/api/v4/version"
+
+# Check packages are enabled on this project
+curl -s -H "PRIVATE-TOKEN: <your-token>" \
+  "http://gitlab.minilab/api/v4/projects/107" \
+  | python3 -c "import sys,json; print(json.load(sys.stdin)['packages_enabled'])"
+```
+
+If `packages_enabled` is `false`, enable it in Project Settings > General > Visibility > Package Registry.
+
+## Step 2: Configure npm Authentication
 
 Create `projects/popout/.npmrc`:
 
@@ -18,40 +30,81 @@ Create `projects/popout/.npmrc`:
 //gitlab.minilab/api/v4/projects/107/packages/npm/:_authToken=YOUR_PAT_TOKEN
 ```
 
-### 2. Add `.npmrc` to `.gitignore`
-
-The `.npmrc` contains your auth token — never commit it.
+**Important:** This file contains your auth token — it is already in `.gitignore`. If starting fresh:
 
 ```bash
 echo "projects/popout/.npmrc" >> .gitignore
 ```
 
-### 3. Build and Publish
+## Step 3: Build the Library
 
 ```bash
-# Build
 npm run build
+```
 
-# Copy .npmrc to dist (required — npm publish reads from cwd)
+This produces the publishable package in `dist/ngx-popout/`.
+
+### Verify the Package Contents
+
+Before publishing, inspect what will be included:
+
+```bash
+cd dist/ngx-popout
+npm pack --dry-run
+```
+
+You should see FESM bundles, type declarations, and the package.json.
+
+## Step 4: Publish
+
+Copy the `.npmrc` into the dist directory and publish:
+
+```bash
 cp projects/popout/.npmrc dist/ngx-popout/
-
-# Publish
 cd dist/ngx-popout
 npm publish
 ```
 
-### Version Bumping
-
-Before publishing a new version, update the version in `projects/popout/package.json`:
-
-```bash
-cd projects/popout
-npm version patch   # 1.0.0 -> 1.0.1
-# or
-npm version minor   # 1.0.0 -> 1.1.0
+You should see:
+```
++ @halolabs/ngx-popout@1.0.0
 ```
 
-Then rebuild and publish.
+## Step 5: Verify on GitLab
+
+Navigate to your GitLab project > Packages & Registries > Package Registry, or:
+
+- **Project level**: `http://gitlab.minilab/halo/ngx-popout/-/packages`
+- **Group level**: `http://gitlab.minilab/groups/halo/-/packages`
+
+Or verify via API:
+
+```bash
+curl -s -H "PRIVATE-TOKEN: <your-token>" \
+  "http://gitlab.minilab/api/v4/projects/107/packages" \
+  | python3 -m json.tool
+```
+
+## Publishing Updates
+
+To publish a new version:
+
+1. Update the version in `projects/popout/package.json`:
+   ```bash
+   cd projects/popout
+   npm version patch   # 1.0.0 -> 1.0.1
+   # or
+   npm version minor   # 1.0.0 -> 1.1.0
+   ```
+2. Rebuild: `npm run build`
+3. Copy `.npmrc` and publish:
+   ```bash
+   cp projects/popout/.npmrc dist/ngx-popout/
+   cd dist/ngx-popout
+   npm publish
+   ```
+
+npm will reject duplicate versions — always increment before publishing.
 
 ## Consumer Setup
 
@@ -62,7 +115,7 @@ Then rebuild and publish.
 //gitlab.minilab/api/v4/groups/7/-/packages/npm/:_authToken=YOUR_PAT_TOKEN
 ```
 
-This uses the **group-level** registry (group ID 7 = `halo`), which serves all `@halolabs/*` packages from any project in the group.
+This uses the **group-level** registry (group ID 7 = `halo`), which serves all `@halolabs/*` packages from any project in the group. Add `.npmrc` to your `.gitignore` if it contains tokens.
 
 ### 2. Install
 
@@ -70,7 +123,23 @@ This uses the **group-level** registry (group ID 7 = `halo`), which serves all `
 npm install @halolabs/ngx-popout
 ```
 
-### 3. Use in your Angular module
+### 3. Peer Dependencies
+
+The library requires these (your Angular 14 project likely already has them):
+
+| Package | Version |
+|---------|---------|
+| `@angular/common` | ^14.2.0 |
+| `@angular/core` | ^14.2.0 |
+| `@angular/cdk` | ^14.2.0 |
+| `rxjs` | ^7.0.0 |
+
+If you don't have Angular CDK:
+```bash
+npm install @angular/cdk@^14.2.0
+```
+
+### 4. Use in your Angular module
 
 ```typescript
 import { PopoutModule } from '@halolabs/ngx-popout';
@@ -95,11 +164,34 @@ constructor(@Optional() private popOutContext: PopOutContextService) {
 }
 ```
 
-## Verifying on GitLab
+### 5. Verify installation
 
-After publishing, the package appears at:
-- **Project level**: `http://gitlab.minilab/halo/ngx-popout/-/packages`
-- **Group level**: `http://gitlab.minilab/groups/halo/-/packages`
+```bash
+npm ls @halolabs/ngx-popout
+```
+
+### Updating
+
+When a new version is published:
+
+```bash
+npm update @halolabs/ngx-popout
+```
+
+Or install a specific version:
+
+```bash
+npm install @halolabs/ngx-popout@1.1.0
+```
+
+## Registry URL Reference
+
+| Scope | URL |
+|-------|-----|
+| Project-level (publish) | `http://gitlab.minilab/api/v4/projects/107/packages/npm/` |
+| Group-level (consume) | `http://gitlab.minilab/api/v4/groups/7/-/packages/npm/` |
+
+Group-level URLs let consumers install any `@halolabs/*` package from the halo group with a single registry entry.
 
 ## Troubleshooting
 
